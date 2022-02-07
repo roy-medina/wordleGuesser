@@ -2,12 +2,19 @@ import pandas as pd
 from english_words import english_words_lower_alpha_set
 from wordfreq import zipf_frequency as wf
 
+def get_all_wordle_words():
+    with open("all_wordle_words.txt", "r") as infile:
+        return [line.strip() for line in infile.readlines()]
+
+words_to_choose_from = list(english_words_lower_alpha_set) + get_all_wordle_words()
+words_to_choose_from = list(set(words_to_choose_from))
+
 LENGTH = 5
 
 class WordleGuesser():
     def __init__(self, length = LENGTH):
         ### Initialize
-        WORD_LIST = pd.DataFrame(list(english_words_lower_alpha_set), columns=['Word'])
+        WORD_LIST = pd.DataFrame(words_to_choose_from, columns=['Word'])
         ### Filter by length
         WORD_LIST = WORD_LIST[WORD_LIST.iloc[:,0].str.len() == LENGTH]
         ### Implement frequency of words
@@ -44,7 +51,7 @@ class WordleGuesser():
     def end(self):
         print('\n\n\n\nThanks for using the Wordle Guesser')
         print(f"We completed today's word in {self.iterNum} iterations")
-        print(f"Your guesses today are {self.guesses[:-2]}, with the final answer being '{self.guesses[-1]}'.")
+        print(f"Your guesses today are {self.guesses[:-1]}, with the final answer being '{self.guesses[-1]}'.")
 
     def WordGuesser(self, greenLetters = None, yellowLetters = [], grayLetters = []):
         self.iterNum += 1
