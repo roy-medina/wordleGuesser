@@ -68,10 +68,6 @@ class WordleGuesser():
                     green = input('\nEnter a letter that is green, followed by a space and the position it is located. (0 refers to the first letter of the word):\t\t').split(' ')
                 greenDict[green[0]] = int(green[1])
                 
-            for key in yellowDict.keys():
-                if not key in self.__duplicates:
-                    if key in greenDict.keys():
-                        self.__duplicates.append(key)
             self.WordGuesser(greenLetters = greenDict, yellowLetters=yellowDict, grayLetters=rejected)
             check = input('\nWas that the final answer? (Y/N):\t\t').lower()
             if check == 'y':
@@ -93,6 +89,10 @@ class WordleGuesser():
         if greenLetters:
             for accepted in greenLetters:
                 self.__has(accepted, greenLetters[accepted])  
+        for key in yellowLetters.keys():
+            if not key in self.__duplicates:
+                if key in greenLetters.keys():
+                    self.__duplicates.append(key)
         if self.__duplicates:
             self.__checkDups()
             self.__duplicates = []
