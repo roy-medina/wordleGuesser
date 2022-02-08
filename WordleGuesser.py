@@ -38,9 +38,14 @@ class WordleGuesser():
             greenTemp = True
             yellowTemp = True
             rejected = input('\nWhat letters are grayed out? Enter them with a space in-between:\t\t').split(' ')
+            if rejected == ['']:
+                rejected = None
             yellow = input('\nEnter a letter that is yellow, followed by a space and the position it is located. (0 refers to the first letter of the word):\t\t').split(' ')
             if yellow == ['']:
                 yellowTemp = False
+                yellow = None
+            else: 
+                yellowDict[yellow[0]] = int(yellow[1])
             while yellowTemp:
                 checkyellow = input('\nAre there any more yellow letters? (Y/N):\t\t').lower()
                 if checkyellow == 'n':
@@ -52,6 +57,9 @@ class WordleGuesser():
             green = input('\nEnter a letter that is green, followed by a space and the position it is located. (0 refers to the first letter of the word):\t\t').split(' ')
             if green == ['']:
                 greenTemp = False
+                green = None
+            else:
+                greenDict[green[0]] = int(green[1])
             while greenTemp:
                 checkGreen = input('\nAre there any more green letters? (Y/N):\t\t').lower()
                 if checkGreen == 'n':
@@ -74,7 +82,7 @@ class WordleGuesser():
         print(f"We completed today's word in {self.iterNum} iterations")
         print(f"Your guesses today are {self.guesses[:-1]}, with the final answer being '{self.guesses[-1]}'.")
 
-    def WordGuesser(self, greenLetters = None, yellowLetters = None, grayLetters = []):
+    def WordGuesser(self, greenLetters = None, yellowLetters = None, grayLetters = None):
         self.iterNum += 1
         if grayLetters:
             for rejected in grayLetters:
@@ -84,12 +92,13 @@ class WordleGuesser():
                 self.__contains(contained, yellowLetters[contained])
         if greenLetters:
             for accepted in greenLetters:
-                self.__has(accepted, greenLetters[accepted])       
-        self.__checkDups()
-        self.__duplicates = []
+                self.__has(accepted, greenLetters[accepted])  
+        if self.__duplicates:
+            self.__checkDups()
+            self.__duplicates = []
+
 
         print(self.__WORD_LIST)
-        print(self.__temp)
         try:
             self.guesses.append(self.__WORD_LIST.iloc[0,0])
             print(f'\n\n\n\nI recommend entering: {self.__WORD_LIST.iloc[0,0]}\n\n\n\n') 
@@ -104,6 +113,7 @@ class WordleGuesser():
             self.__containedNotIn[position].append(letter)
             self.__temp[position] = f'[^{"".join(self.__containedNotIn[position])}]'
             self.__WORD_LIST = self.__WORD_LIST[self.__WORD_LIST.iloc[:,0].str.contains(r"{}{}{}{}{}".format(self.__temp[0],self.__temp[1],self.__temp[2],self.__temp[3],self.__temp[4],), regex = True)]
+        self.__WORD_LIST = self.__WORD_LIST[self.__WORD_LIST.iloc[:,0].str.contains(r"{}".format(letter))]
 
     def __has(self, letter, position):
         self.__temp[position] = letter
@@ -112,7 +122,7 @@ class WordleGuesser():
     def __checkDups(self):
         for letter in self.__duplicates:
             self.__WORD_LIST = self.__WORD_LIST[self.__WORD_LIST['Word'].str.count(letter) == 2]
-
+        
     def getTemp(self):
         return self.__temp
 
@@ -122,8 +132,6 @@ class WordleGuesser():
     def checkWordList(self, word):
         result = self.__WORD_LIST[self.__WORD_LIST['Word'] == word]
         return print(result)
-
-
 
 if __name__ == '__main__':
     game = WordleGuesser()
